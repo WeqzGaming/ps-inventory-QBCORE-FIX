@@ -1,5 +1,13 @@
 # PS-Inventory
 
+FIXED AND UPDATED FOR LATEST QB CORE - FIXED BY ItzMuri/JericoFX Pull Requests & WeqzGaming
+
+Issued Fixed:
+- Weapon attachments can now be removed from weapons
+- When you rob or search someone they can access their inventory after instead of not being able to open inventory
+- Fixed CSS when you use items the words fit properly with the imgs
+
+
 lj-Inventory has been fully redesigned by [OK1ez](https://github.com/OK1ez), under the name ps-inventory.
 
 Future updates will be coming and we will of course support all normal monitor sizes.
