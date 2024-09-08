@@ -981,17 +981,6 @@ local function CreateNewDrop(source, fromSlot, toSlot, itemAmount, created)
 	end
 end
 
-local function OpenInventoryById(source, targetId)
-    local QBPlayer = QBCore.Functions.GetPlayer(source)
-    local TargetPlayer = QBCore.Functions.GetPlayer(tonumber(targetId))
-    if not QBPlayer or not TargetPlayer then return end
-    if Player(targetId).state.inv_busy then TriggerClientEvent("ps-inventory:client:closeinv", targetId) end
-    Wait(1500)
-    Player(targetId).state.inv_busy = true
-    OpenInventory("otherplayer", targetId, nil, source)
-end
-
-exports('OpenInventoryById', OpenInventoryById)
 
 local function OpenInventory(name, id, other, origin)
 
@@ -1029,7 +1018,7 @@ local function OpenInventory(name, id, other, origin)
 	local ply = Player(src)
     local Player = QBCore.Functions.GetPlayer(src)
 	if ply.state.inv_busy then
-		return QBCore.Functions.Notify(src, Lang:t("notify.noaccess"), 'error')
+		return QBCore.Functions.Notify(src, "You do not have access", 'error')
 	end
 	if name and id then
 		local secondInv = {}
@@ -1238,7 +1227,34 @@ local function OpenInventory(name, id, other, origin)
 end
 exports('OpenInventory',OpenInventory)
 
--- Events
+local function OpenInventoryById(source, targetId)
+    local QBPlayer = QBCore.Functions.GetPlayer(source)
+    local TargetPlayer = QBCore.Functions.GetPlayer(tonumber(targetId))
+    if not QBPlayer or not TargetPlayer then return end
+
+    -- Check if the target player is busy and close their inventory if needed
+    if Player(targetId).state.inv_busy then
+        TriggerClientEvent("ps-inventory:client:closeinv", targetId)
+    end
+
+    -- Wait before setting inv_busy to true to avoid conflicts
+    Wait(1500)
+
+    -- Set inv_busy to true to indicate the inventory is open
+    Player(targetId).state.inv_busy = true
+
+    -- Open the inventory for the target player
+    OpenInventory("otherplayer", targetId, nil, source)
+
+    -- Reset inv_busy after a delay to allow inventory interaction to complete
+    Citizen.SetTimeout(5000, function()
+        Player(targetId).state.inv_busy = false
+    end)
+end
+
+exports('OpenInventoryById', OpenInventoryById)
+
+
 
 AddEventHandler('QBCore:Server:PlayerLoaded', function(Player)
 	QBCore.Functions.AddPlayerMethod(Player.PlayerData.source, "AddItem", function(item, amount, slot, info)
